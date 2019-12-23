@@ -16,7 +16,7 @@ def getFile():
 def getNameSpace(projectFiledir,fileParentdir,filename):
     tailInfo=fileParentdir[len(projectFiledir):]
     s=tailInfo.split('\\')
-    s=[folder for folder in s if folder]
+    s=[folder for folder in s if folder if 'include' not in folder]
     firstLine='namespace '
 
     for i,folder in enumerate(s):

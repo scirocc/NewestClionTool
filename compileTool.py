@@ -298,7 +298,6 @@ def getContentWithoutBrace(str_):  # 去掉{}当中的内容，template中的模
 
 
 
-
 def reWriteThisCPPFile(sourceFilePath):
     with open(sourceFilePath, 'r', encoding='utf-8')as f:
         datas = f.readlines()
@@ -339,7 +338,7 @@ def getHPPFileContent(filepath):
     str_ = str_include + str_
     return (str_)
 
-def removeTemplate(str_):
+def removeTemplate(str_):#针对cpp
     sData = str_.split('\n')
     recursiveMark = False
     lastline = ''
@@ -353,10 +352,13 @@ def removeTemplate(str_):
         if condition1 or condition2:  # 可以删除
             indexOfleftBrace = line.find('{')
             if indexOfleftBrace != -1:  # 找到了，那么就可以删除
+                #查找template t的位置
+                indexOfTemplate=str_.rfind('template',indexOfleftBrace)
                 recursiveMark = True
                 indexOfStr = indexOfleftBrace + lineLen + lineCounter
                 endloc = getIndexOfCorreBrace(str_, indexOfStr, 1, 0)
-                str_ = str_.replace(str_[indexOfStr:endloc + 1], ';')
+                # str_ = str_.replace(str_[indexOfStr:endloc + 1], ';')
+                str_ = str_.replace(str_[indexOfTemplate:endloc + 1], ';')
                 break
         else:#不可以删除
             pass
@@ -385,11 +387,11 @@ def getHFileContent(filepath):
 def adjustCPPfile(filepath):#remove template lines
     with open(filepath, 'r', encoding='utf-8')as f: datas = f.readlines()
     sData = [line for line in datas if '#include' not in line]
-    sInclude_str = [line for line in datas if '#include' in line]
     str_ = "".join(sData)
     str_ = removeTemplate(str_)
-    str_include = "".join(sInclude_str) + '\n'
-    str_ = str_include + str_
+    filename=filepath[filepath.rfind('\\')+1:]
+    filename=filename.replace('.cpp', '.hpp')
+    str_ ="#include <{}>\n".format(filename)  + str_
     with open(filepath, 'w', encoding='utf-8')as f:
         f.write(str_)
 
