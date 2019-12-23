@@ -33,9 +33,22 @@ def getNameSpace(projectFiledir,fileParentdir,filename):
     return(firstLine,lastLine)
 
 def writeInclude(fileParentdir,filename,firstLine,lastLine):
+    with open(fileParentdir + '\\' + filename, 'r', encoding='gbk')as f:
+        sline=f.readlines()
+        for line in sline:
+            if line:
+                if '#ifndef' in line:
+                    ifndef_line=line
+                elif '#define' in line:
+                    define_line=line
+                elif '#endif' in line:
+                    endif_line=line
+
 
 
     with open(fileParentdir+'\\'+filename,'w',encoding='gbk')as f:
+        f.write(ifndef_line)
+        f.write(define_line)
         f.write('#include<dictTrans.hpp>\n')
         f.write('#include<glob.h>\n')
         f.write('#include<ioStuff.hpp>\n')
@@ -50,8 +63,8 @@ def writeInclude(fileParentdir,filename,firstLine,lastLine):
 
 
         f.write(firstLine)
-        f.write(lastLine)
-
+        f.write(lastLine+'\n')
+        f.write(endif_line)
 
 
 projectFiledir,fileParentdir,filename=getFile()

@@ -89,7 +89,7 @@ def WriteMake(ab_dir, projectName, sSrcFile, sDLL, sLIB, sInclude, slibFolder, s
         f.write('include_directories(include)\n')
         f.write('include_directories(E:/CPPTOOL/eigen337)\n')
         f.write('include_directories(E:/CPPTOOL/nolhmann)\n')
-        f.write('include_directories(E:/CPPTOOL/MyTool/include)\n')
+        f.write('include_directories(E:/CLionProjects/MYtoolTest/MyTool/include)\n')
 
         f.write(
             'include_directories(D:/ProgramData/Anaconda3/include)\n')  # 还要把python的inlcude文件夹添加进来，因为有可能和python交互，用到python.h
@@ -331,6 +331,9 @@ def getHPPFileContent(filepath):
     return (content)
 
 
+#
+
+
 def getHFileContent(filepath):
     with open(filepath, 'r', encoding='utf-8')as f: datas = f.readlines()
     sData = [line for line in datas if '#include' not in line]
@@ -388,8 +391,8 @@ def autoReplenishFile():
                         str_ = '\n#endif'
                         f.write(str_)
                     # 把源文件标志为弃用
-                    with open(file, 'w')as f:
-                        f.write('//OriginSrcFile contain template,deprecated')
+                    # with open(file, 'w')as f:
+                    #     f.write('//OriginSrcFile contain template,deprecated')
                     sSrcFile.remove(file)
                 else:  # 这个时候不含tempalte，采用正常的分离模式
                     print(file, 'withouttemplate')
@@ -441,12 +444,14 @@ def examinFolder():
     ab_dir = s[1]
     findAllSrcFile(ab_dir + '/src/*')
     findAllSrcFile(ab_dir + '/MyTool/src/*')
+    findAllSrcFile('E:/CLionProjects/MYtoolTest/MyTool/src/*')
 
     findALLLibFile(ab_dir + '/bin/*')
     findALLDllFile(ab_dir + '/bin/*')
 
     findALLIncludeFile(ab_dir + '/MyTool/include/*')
     findALLIncludeFile(ab_dir + '/include/*')
+    # findALLIncludeFile('E:/CLionProjects/MYtoolTest/MyTool/include/*')
     print('项目源文件集合:', sSrcFile)
     print('项目动态库文件集合:', sDLL)
     print('项目静态库文件集合:', sLIB)
