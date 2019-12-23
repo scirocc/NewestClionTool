@@ -266,7 +266,7 @@ def getIndexOfCorreBrace(str_, locOfFirstLeftBrace, left_sign_counter, right_sig
                 return (result)
 
 
-def getContentWithoutBrace(str_):  # 去掉{}当中的内容
+def getContentWithoutBrace(str_):  # 去掉{}当中的内容，template中的模板不许更新
     sData = str_.split('\n')
     recursiveMark = False
     lastline = ''
@@ -275,9 +275,9 @@ def getContentWithoutBrace(str_):  # 去掉{}当中的内容
     for line in sData:
         # 1 同一行包括'namespace'或'class'且包括'{' 这样括号间的内容不可删除
         # 2 本行虽然没有'namespace'或'class'，且本行包括'{'，但上一行包括'namespace'或'class',且上一行不含'{' 这样括号间的内容不可删除
-        condition1 = (('namespace' in line) or ('class' in line)) and ('{' in line)
-        condition2 = ((('namespace' not in line) and ('class' not in line)) and ('{' in line) and
-                      (('namespace' in lastline) or ('class' in lastline)) and ('{' not in lastline))
+        condition1 = (('namespace' in line) or ('class' in line)or('template' in line)) and ('{' in line)
+        condition2 = ((('namespace' not in line) and ('class' not in line)and(('template' not in line))) and ('{' in line) and
+                      (('namespace' in lastline) or ('class' in lastline)or('template' in lastline)) and ('{' not in lastline))
         if condition1 or condition2:  # 不可删除，看下一行
             pass
         else:
@@ -295,6 +295,8 @@ def getContentWithoutBrace(str_):  # 去掉{}当中的内容
         return (str_)
     else:
         return (getContentWithoutBrace(str_))
+
+
 
 
 def reWriteThisCPPFile(sourceFilePath):
@@ -326,12 +328,46 @@ def tell_if_is_templateFile(filepath):
 
 
 def getHPPFileContent(filepath):
-    with open(filepath, 'r', encoding='utf-8')as f: sData = f.readlines()
-    content = ''.join(sData)
-    return (content)
+    with open(filepath, 'r', encoding='utf-8')as f: datas = f.readlines()
+    sData = [line for line in datas if '#include' not in line]
+    sInclude_str = [line for line in datas if '#include' in line]
+    str_ = "".join(sData)
+    # str_ = getRidOfTextBetweenDoubleQuote(str_)  # 去掉正文中的小括号
+    # str_ = getRidOfTextBetweenSingleQuote(str_).strip()
+    str_ = getContentWithoutBrace(str_)#去掉非模板方法
+    str_include = "".join(sInclude_str) + '\n'
+    str_ = str_include + str_
+    return (str_)
 
+def removeTemplate(str_):
+    sData = str_.split('\n')
+    recursiveMark = False
+    lastline = ''
+    lineLen = 0
+    lineCounter = 0
+    for line in sData:
+        # 1 同一行包括'namespace'或'class'且包括'{' 这样括号间的内容不可删除
+        # 2 本行虽然没有'namespace'或'class'，且本行包括'{'，但上一行包括'namespace'或'class',且上一行不含'{' 这样括号间的内容不可删除
+        condition1 = ('template' in line) and ('{' in line)
+        condition2 = ( 'template' not in line) and ('{' in line) and('template' in lastline) and ('{' not in lastline)
+        if condition1 or condition2:  # 可以删除
+            indexOfleftBrace = line.find('{')
+            if indexOfleftBrace != -1:  # 找到了，那么就可以删除
+                recursiveMark = True
+                indexOfStr = indexOfleftBrace + lineLen + lineCounter
+                endloc = getIndexOfCorreBrace(str_, indexOfStr, 1, 0)
+                str_ = str_.replace(str_[indexOfStr:endloc + 1], ';')
+                break
+        else:#不可以删除
+            pass
+        lineCounter += 1
+        lineLen += len(line)
+        lastline = line
+    if not recursiveMark:
+        return (str_)
+    else:
+        return (getContentWithoutBrace(str_))
 
-#
 
 
 def getHFileContent(filepath):
@@ -339,12 +375,25 @@ def getHFileContent(filepath):
     sData = [line for line in datas if '#include' not in line]
     sInclude_str = [line for line in datas if '#include' in line]
     str_ = "".join(sData)
-    str_ = getRidOfTextBetweenDoubleQuote(str_)  # 去掉正文中的小括号
-    str_ = getRidOfTextBetweenSingleQuote(str_).strip()
+    # str_ = getRidOfTextBetweenDoubleQuote(str_)  # 去掉正文中的小括号
+    # str_ = getRidOfTextBetweenSingleQuote(str_).strip()
     str_ = getContentWithoutBrace(str_)
     str_include = "".join(sInclude_str) + '\n'
     str_ = str_include + str_
     return (str_)
+
+def adjustCPPfile(filepath):#remove template lines
+    with open(filepath, 'r', encoding='utf-8')as f: datas = f.readlines()
+    sData = [line for line in datas if '#include' not in line]
+    sInclude_str = [line for line in datas if '#include' in line]
+    str_ = "".join(sData)
+    str_ = removeTemplate(str_)
+    str_include = "".join(sInclude_str) + '\n'
+    str_ = str_include + str_
+    with open(filepath, 'w', encoding='utf-8')as f:
+        f.write(str_)
+
+
 
 
 def autoReplenishFile():
@@ -393,6 +442,7 @@ def autoReplenishFile():
                     # 把源文件标志为弃用
                     # with open(file, 'w')as f:
                     #     f.write('//OriginSrcFile contain template,deprecated')
+                    adjustCPPfile(file)
                     sSrcFile.remove(file)
                 else:  # 这个时候不含tempalte，采用正常的分离模式
                     print(file, 'withouttemplate')
