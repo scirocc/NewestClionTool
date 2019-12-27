@@ -1,4 +1,4 @@
-
+import shutil
 import sys
 import os
 import win32api
@@ -513,9 +513,38 @@ def examinFolder():
     return (ab_dir, projectName, sSrcFile, sDLL, sLIB, sInclude, slibFolder, sIncludefolder)
 
 
+def trytocopyQTdll():
+    s = sys.argv
+    projectDir = s[1]
+    #查看是否存在cmake-build-debug文件夹  cmake-build-release文件夹
+    path1=projectDir+'/cmake-build-debug'
+    path2=projectDir+'/cmake-build-release'
+    if not os.path.exists(path1):
+        try:os.makedirs(path1)
+        except:pass
+    if not os.path.exists(path2):
+        try:os.makedirs(path2)
+        except:pass
+    # 查看是否存在platform文件夹
+    path3 = projectDir + '/cmake-build-debug/platforms'
+    path4 = projectDir + '/cmake-build-release/platforms'
+    if not os.path.exists(path3):#若不存在
+        try:
+            shutil.copytree("D:\ProgramData\Anaconda3\Library\plugins\platforms",path3)
+            os.makedirs(path1)
+        except:
+            pass
+    if not os.path.exists(path4):#若不存在
+        try:
+            shutil.copytree("D:\ProgramData\Anaconda3\Library\plugins\platforms",path4)
+        except:
+            pass
+
+
 def main():
     s = sys.argv
     projectDir = s[1]
+    trytocopyQTdll()
     try:
         os.makedirs(projectDir + '/bin/')
     except:
@@ -541,6 +570,10 @@ def main():
     ab_dir, projectName, sSrcFile, sDLL, sLIB, sInclude, slibFolder, sIncludefolder = examinFolder()
     WriteMake(ab_dir, projectName, sSrcFile, sDLL, sLIB, sInclude, slibFolder, sIncludefolder)
     return 0
+
+
+
+
 
 
 main()
