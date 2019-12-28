@@ -33,7 +33,7 @@ def findALLLibFile(ab_dir):
     if not sLib:
         return 0
     for file in sLib:
-        if os.path.isfile(file) and '.lib' in file:
+        if os.path.isfile(file) and (('.lib' in file) or('.a' in file)):
             sLIB.append(file)
             slibFolder.append(os.path.split(file)[0])
         elif os.path.isdir(file):  # 这时候需要继续迭代
@@ -47,7 +47,7 @@ def findALLDllFile(ab_dir):
     if not sDll:
         return 0
     for file in sDll:
-        if os.path.isfile(file) and '.dll' in file:
+        if os.path.isfile(file) and '.dll' in file and ('.a'  not in file):
             sDLL.append(file)
         elif os.path.isdir(file):  # 这时候需要继续迭代
             path = file + '/*'
