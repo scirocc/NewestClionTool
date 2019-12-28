@@ -544,7 +544,7 @@ def trytocopyQTdll():
 def main():
     s = sys.argv
     projectDir = s[1]
-    trytocopyQTdll()
+    # trytocopyQTdll()
     try:
         os.makedirs(projectDir + '/bin/')
     except:
