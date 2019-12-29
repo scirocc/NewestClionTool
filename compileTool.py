@@ -87,8 +87,8 @@ def WriteMake(ab_dir, projectName, sSrcFile, sDLL, sLIB, sInclude, slibFolder, s
         # f.write('set(CMAKE_C_COMPILER   "C:/msys64/mingw64/bin/clang")\n')
         f.write('set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")\n')
         f.write('include_directories(include)\n')
-        f.write('include_directories(E:/CPPTOOL/eigen337)\n')
-        f.write('include_directories(E:/CPPTOOL/nolhmann)\n')
+        # f.write('include_directories(E:/CPPTOOL/eigen337)\n')
+        # f.write('include_directories(E:/CPPTOOL/nolhmann)\n')
         f.write('include_directories(E:/CLionProjects/MYtoolTest/MyTool/include)\n')
 
         f.write(
