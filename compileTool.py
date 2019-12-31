@@ -445,7 +445,7 @@ def autoReplenishFile():
                     # with open(file, 'w')as f:
                     #     f.write('//OriginSrcFile contain template,deprecated')
                     adjustCPPfile(file)
-                    sSrcFile.remove(file)
+                    # sSrcFile.remove(file)
                 else:  # 这个时候不含tempalte，采用正常的分离模式
                     print(file, 'withouttemplate')
 
@@ -456,6 +456,10 @@ def autoReplenishFile():
                         s.extend(folder.split('/'))
                     sFolder = s
                     sFolder = sFolder[sFolder.index(projectName):-1]
+                    if not os.path.isdir(corresponding_header1[:corresponding_header1.index(corresponding_header1.split('\\')[-1])]):
+                        try:os.makedirs(corresponding_header1[:corresponding_header1.index(corresponding_header1.split('\\')[-1])])
+                        except:pass
+
                     with open(corresponding_header1, 'w', encoding='utf-8')as f:
                         str_ = '#ifndef '
                         for folder in sFolder:
@@ -499,12 +503,16 @@ def examinFolder():
     findAllSrcFile('E:/CLionProjects/MYtoolTest/MyTool/src/*')
 
     findALLLibFile(ab_dir + '/bin/*')
+    findALLLibFile('E:\CLionProjects\MYtoolTest/bin/*')
+
     findALLDllFile(ab_dir + '/bin/*')
     findALLDllFile('E:\CLionProjects\MYtoolTest/bin/*')
 
 
     findALLIncludeFile(ab_dir + '/MyTool/include/*')
     findALLIncludeFile(ab_dir + '/include/*')
+    findALLIncludeFile('E:\CLionProjects\MYtoolTest/include/*')
+
     # findALLIncludeFile('E:/CLionProjects/MYtoolTest/MyTool/include/*')
     print('项目源文件集合:', sSrcFile)
     print('项目动态库文件集合:', sDLL)
