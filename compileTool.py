@@ -550,9 +550,9 @@ def trytocopyQTdll():
     # 查看是否存在那些动态库
     for dll in sDLL:
         if not os.path.exists(path1+'\\'+dll.split('/')[-1]):
-            shutil.copy(dll,path1)
+            shutil.copy(dll, path1)
         if not os.path.exists(path2+'\\'+dll.split('/')[-1]):
-            shutil.copy(dll,path2)
+            shutil.copy(dll, path2)
     #
     #
     #
