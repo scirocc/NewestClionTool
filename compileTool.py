@@ -60,10 +60,17 @@ def findALLIncludeFile(ab_dir):
         return 0
     for file in sinclude_:
         if os.path.isfile(file) and (('.h' in file) or ('.c' in file) or ('.hpp' in file)):
-            sInclude.append(file)
-            sIncludefolder.append(os.path.split(file)[0])
+            if "tbb" not in os.path.split(file)[0]:
+                sIncludefolder.append(os.path.split(file)[0])
+            if "armadillo" in os.path.split(file)[0]:
+                pass
+            else:
+                sInclude.append(file)
+            # sIncludefolder.append(os.path.split(file)[0])
         elif os.path.isdir(file):  # 这时候需要继续迭代
-            sIncludefolder.append(file)
+            if "tbb" not in file:
+
+                sIncludefolder.append(file)
             path = file + '/*'
             findALLIncludeFile(path)
 
@@ -422,6 +429,8 @@ def autoReplenishFile():
                         s.extend(folder.split('/'))
                     sFolder = s
                     sFolder = sFolder[sFolder.index(projectName):-1]
+                    try:os.makedirs("\\".join(corresponding_header2.split('\\')[:-1]))
+                    except:pass
                     with open(corresponding_header2, 'w', encoding='utf-8')as f:
                         str_ = '#ifndef '
                         for folder in sFolder:
@@ -512,6 +521,9 @@ def examinFolder():
     findALLIncludeFile(ab_dir + '/MyTool/include/*')
     findALLIncludeFile(ab_dir + '/include/*')
     findALLIncludeFile('E:\CLionProjects\MYtoolTest/include/*')
+    global sIncludefolder
+    sIncludefolder.append('E:/CLionProjects/MYtoolTest/include')
+    # sIncludefolder
 
     # findALLIncludeFile('E:/CLionProjects/MYtoolTest/MyTool/include/*')
     print('项目源文件集合:', sSrcFile)
