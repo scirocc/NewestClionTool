@@ -121,7 +121,8 @@ def WriteMake(ab_dir, projectName, sSrcFile, sDLL, sLIB, sInclude, slibFolder, s
         str1_ = 'TARGET_LINK_LIBRARIES({}'.format(projectName) + ' \n'
         for dll in set(sDLL):
             dll = dll.replace('\\', '/')
-            str1_ += dll + '\n'
+            if 'libtbb' not in dll:
+                str1_ += dll + '\n'
         str1_ += ')\n'
         f.write('{}'.format(str1_))
     return 0
