@@ -522,6 +522,7 @@ def examinFolder():
     findALLIncludeFile(ab_dir + '/MyTool/include/*')
     findALLIncludeFile(ab_dir + '/include/*')
     findALLIncludeFile('E:\CLionProjects\MYtoolTest/include/*')
+    findALLIncludeFile('E:/CLionProjects/MYtoolTest/MyTool/include')
     global sIncludefolder
     sIncludefolder.append('E:/CLionProjects/MYtoolTest/include')
     # sIncludefolder
@@ -550,6 +551,8 @@ def trytocopyQTdll():
         except:pass
     # 查看是否存在那些动态库
     for dll in sDLL:
+        print(1)
+        print(dll)
         if not os.path.exists(path1+'\\'+dll.split('/')[-1]):
             shutil.copy(dll, path1)
         if not os.path.exists(path2+'\\'+dll.split('/')[-1]):
