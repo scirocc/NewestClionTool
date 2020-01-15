@@ -95,7 +95,7 @@ def WriteMake(ab_dir, projectName, sSrcFile, sDLL, sLIB, sInclude, slibFolder, s
         f.write('set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")\n')
         f.write('set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")\n')
         f.write('set(CMAKE_CXX_FLAGS_RELEASE "-O3")\n')
-        f.write('set(CMAKE_CXX_FLAGS_DEBUG "-O2")\n')
+        f.write('set(CMAKE_CXX_FLAGS_DEBUG "-O2")   \n')
         f.write('include_directories(include)\n')
         # f.write('include_directories(E:/CPPTOOL/eigen337)\n')
         # f.write('include_directories(E:/CPPTOOL/nolhmann)\n')
@@ -514,6 +514,7 @@ def examinFolder():
     findAllSrcFile(ab_dir + '/src/*')
     findAllSrcFile(ab_dir + '/MyTool/src/*')
     findAllSrcFile('E:/CLionProjects/MYtoolTest/MyTool/src/*')
+    findAllSrcFile('E:/CLionProjects/MYtoolTest/src/simdjson/*')
 
     findALLLibFile(ab_dir + '/bin/*')
     findALLLibFile('E:\CLionProjects\MYtoolTest/bin/*')
