@@ -6,17 +6,9 @@ import win32con
 import glob
 import time
 
-# print(123)
-#
-sSrcFile = []
-sLIB = []
-sDLL = []
-sInclude = []
-slibFolder = []
-sIncludefolder = []
 
 
-def findAllSrcFile(ab_dir):  # src目录下的所有文件及其子目录内的文件
+def findAllSrcFile(ab_dir,sSrcFile):  # src目录下的所有文件及其子目录内的文件
     sSrc = glob.glob(ab_dir)
     if not sSrc:
         return 0
@@ -25,36 +17,36 @@ def findAllSrcFile(ab_dir):  # src目录下的所有文件及其子目录内的�
             sSrcFile.append(file)
         elif os.path.isdir(file):  # 这时候需要继续迭代
             path = file + '/*'
-            findAllSrcFile(path)
+            findAllSrcFile(path,sSrcFile)
 
 
-def findALLLibFile(ab_dir):
+def findALLLibFile(ab_dir,sLIB,slibFolder):
     sLib = glob.glob(ab_dir)
     if not sLib:
         return 0
     for file in sLib:
-        if os.path.isfile(file) and (('.lib' in file) or('.a' in file)):
+        if os.path.isfile(file) and (('.lib' in file) or ('.a' in file)):
             sLIB.append(file)
             slibFolder.append(os.path.split(file)[0])
         elif os.path.isdir(file):  # 这时候需要继续迭代
             slibFolder.append(file)
             path = file + '/*'
-            findALLLibFile(path)
+            findALLLibFile(path,sLIB,slibFolder)
 
 
-def findALLDllFile(ab_dir):
+def findALLDllFile(ab_dir,sDLL):
     sDll = glob.glob(ab_dir)
     if not sDll:
         return 0
     for file in sDll:
-        if os.path.isfile(file) and '.dll' in file and ('.a'  not in file):
+        if os.path.isfile(file) and '.dll' in file and ('.a' not in file):
             sDLL.append(file)
         elif os.path.isdir(file):  # 这时候需要继续迭代
             path = file + '/*'
-            findALLDllFile(path)
+            findALLDllFile(path,sDLL)
 
 
-def findALLIncludeFile(ab_dir):
+def findALLIncludeFile(ab_dir,sInclude,sIncludefolder):
     sinclude_ = glob.glob(ab_dir)
     if not sinclude_:
         return 0
@@ -69,10 +61,9 @@ def findALLIncludeFile(ab_dir):
             # sIncludefolder.append(os.path.split(file)[0])
         elif os.path.isdir(file):  # 这时候需要继续迭代
             if "tbb" not in file:
-
                 sIncludefolder.append(file)
             path = file + '/*'
-            findALLIncludeFile(path)
+            findALLIncludeFile(path,sInclude,sIncludefolder)
 
 
 def WriteMake(ab_dir, projectName, sSrcFile, sDLL, sLIB, sInclude, slibFolder, sIncludefolder):
@@ -286,9 +277,11 @@ def getContentWithoutBrace(str_):  # 去掉{}当中的内容，template中的模
     for line in sData:
         # 1 同一行包括'namespace'或'class'且包括'{' 这样括号间的内容不可删除
         # 2 本行虽然没有'namespace'或'class'，且本行包括'{'，但上一行包括'namespace'或'class',且上一行不含'{' 这样括号间的内容不可删除
-        condition1 = (('namespace' in line) or ('class' in line)or('template' in line)) and ('{' in line)
-        condition2 = ((('namespace' not in line) and ('class' not in line)and(('template' not in line))) and ('{' in line) and
-                      (('namespace' in lastline) or ('class' in lastline)or('template' in lastline)) and ('{' not in lastline))
+        condition1 = (('namespace' in line) or ('class' in line) or ('template' in line)) and ('{' in line)
+        condition2 = ((('namespace' not in line) and ('class' not in line) and (('template' not in line))) and (
+                    '{' in line) and
+                      (('namespace' in lastline) or ('class' in lastline) or ('template' in lastline)) and (
+                                  '{' not in lastline))
         if condition1 or condition2:  # 不可删除，看下一行
             pass
         else:
@@ -306,7 +299,6 @@ def getContentWithoutBrace(str_):  # 去掉{}当中的内容，template中的模
         return (str_)
     else:
         return (getContentWithoutBrace(str_))
-
 
 
 def reWriteThisCPPFile(sourceFilePath):
@@ -344,12 +336,13 @@ def getHPPFileContent(filepath):
     str_ = "".join(sData)
     # str_ = getRidOfTextBetweenDoubleQuote(str_)  # 去掉正文中的小括号
     # str_ = getRidOfTextBetweenSingleQuote(str_).strip()
-    str_ = getContentWithoutBrace(str_)#去掉非模板方法
+    str_ = getContentWithoutBrace(str_)  # 去掉非模板方法
     str_include = "".join(sInclude_str) + '\n'
     str_ = str_include + str_
     return (str_)
 
-def removeTemplate(str_):#针对cpp
+
+def removeTemplate(str_):  # 针对cpp
     sData = str_.split('\n')
     recursiveMark = False
     lastline = ''
@@ -359,19 +352,19 @@ def removeTemplate(str_):#针对cpp
         # 1 同一行包括'namespace'或'class'且包括'{' 这样括号间的内容不可删除
         # 2 本行虽然没有'namespace'或'class'，且本行包括'{'，但上一行包括'namespace'或'class',且上一行不含'{' 这样括号间的内容不可删除
         condition1 = ('template' in line) and ('{' in line)
-        condition2 = ( 'template' not in line) and ('{' in line) and('template' in lastline) and ('{' not in lastline)
+        condition2 = ('template' not in line) and ('{' in line) and ('template' in lastline) and ('{' not in lastline)
         if condition1 or condition2:  # 可以删除
             indexOfleftBrace = line.find('{')
             if indexOfleftBrace != -1:  # 找到了，那么就可以删除
-                #查找template t的位置
-                indexOfTemplate=str_.rfind('template',indexOfleftBrace)
+                # 查找template t的位置
+                indexOfTemplate = str_.rfind('template', indexOfleftBrace)
                 recursiveMark = True
                 indexOfStr = indexOfleftBrace + lineLen + lineCounter
                 endloc = getIndexOfCorreBrace(str_, indexOfStr, 1, 0)
                 # str_ = str_.replace(str_[indexOfStr:endloc + 1], ';')
                 str_ = str_.replace(str_[indexOfTemplate:endloc + 1], ';')
                 break
-        else:#不可以删除
+        else:  # 不可以删除
             pass
         lineCounter += 1
         lineLen += len(line)
@@ -380,7 +373,6 @@ def removeTemplate(str_):#针对cpp
         return (str_)
     else:
         return (getContentWithoutBrace(str_))
-
 
 
 def getHFileContent(filepath):
@@ -395,21 +387,20 @@ def getHFileContent(filepath):
     str_ = str_include + str_
     return (str_)
 
-def adjustCPPfile(filepath):#remove template lines
+
+def adjustCPPfile(filepath):  # remove template lines
     with open(filepath, 'r', encoding='utf-8')as f: datas = f.readlines()
     sData = [line for line in datas if '#include' not in line]
     str_ = "".join(sData)
     str_ = removeTemplate(str_)
-    filename=filepath[filepath.rfind('\\')+1:]
-    filename=filename.replace('.cpp', '.hpp')
-    str_ ="#include <{}>\n".format(filename)  + str_
+    filename = filepath[filepath.rfind('\\') + 1:]
+    filename = filename.replace('.cpp', '.hpp')
+    str_ = "#include <{}>\n".format(filename) + str_
     with open(filepath, 'w', encoding='utf-8')as f:
         f.write(str_)
 
 
-
-
-def autoReplenishFile():
+def autoReplenishFile(sSrcFile):
     s = sys.argv
     projectDir = s[1]
     projectName = projectDir.split('\\')[-1]
@@ -433,8 +424,10 @@ def autoReplenishFile():
                         s.extend(folder.split('/'))
                     sFolder = s
                     sFolder = sFolder[sFolder.index(projectName):-1]
-                    try:os.makedirs("\\".join(corresponding_header2.split('\\')[:-1]))
-                    except:pass
+                    try:
+                        os.makedirs("\\".join(corresponding_header2.split('\\')[:-1]))
+                    except:
+                        pass
                     with open(corresponding_header2, 'w', encoding='utf-8')as f:
                         str_ = '#ifndef '
                         for folder in sFolder:
@@ -469,9 +462,13 @@ def autoReplenishFile():
                         s.extend(folder.split('/'))
                     sFolder = s
                     sFolder = sFolder[sFolder.index(projectName):-1]
-                    if not os.path.isdir(corresponding_header1[:corresponding_header1.index(corresponding_header1.split('\\')[-1])]):
-                        try:os.makedirs(corresponding_header1[:corresponding_header1.index(corresponding_header1.split('\\')[-1])])
-                        except:pass
+                    if not os.path.isdir(
+                            corresponding_header1[:corresponding_header1.index(corresponding_header1.split('\\')[-1])]):
+                        try:
+                            os.makedirs(corresponding_header1[
+                                        :corresponding_header1.index(corresponding_header1.split('\\')[-1])])
+                        except:
+                            pass
 
                     with open(corresponding_header1, 'w', encoding='utf-8')as f:
                         str_ = '#ifndef '
@@ -506,32 +503,41 @@ def pushShutcut():
 
 
 def examinFolder():
+    sDLL=[]
+    sSrcFile = []
+    sLIB = []
+    sInclude = []
+    slibFolder = []
+    sIncludefolder = []
     s = sys.argv
     x, projectFiledir, filedir = s
     projectName = projectFiledir[projectFiledir.rfind('\\') + 1:]
     # 找出项目绝对路径
     ab_dir = s[1]
-    findAllSrcFile(ab_dir + '/src/*')
-    findAllSrcFile(ab_dir + '/MyTool/src/*')
-    findAllSrcFile('E:/CLionProjects/MYtoolTest/MyTool/src/*')
-    findAllSrcFile('E:/CLionProjects/MYtoolTest/src/simdjson/*')
+    findAllSrcFile(ab_dir + '/src/*',sSrcFile)
+    findAllSrcFile(ab_dir + '/MyTool/src/*',sSrcFile)
+    findAllSrcFile('E:/CLionProjects/MYtoolTest/MyTool/src/*',sSrcFile)
+    findAllSrcFile('E:/CLionProjects/MYtoolTest/src/simdjson/*',sSrcFile)
 
-    findALLLibFile(ab_dir + '/bin/*')
-    findALLLibFile('E:\CLionProjects\MYtoolTest/bin/*')
+    findALLLibFile(ab_dir + '/bin/*',sLIB,slibFolder)
+    findALLLibFile('E:\CLionProjects\MYtoolTest/bin/*',sLIB,slibFolder)
 
-    findALLDllFile(ab_dir + '/bin/*')
-    findALLDllFile('E:\CLionProjects\MYtoolTest/bin/*')
+    findALLDllFile(ab_dir + '/bin/*',sDLL)
+    findALLDllFile('E:\CLionProjects\MYtoolTest/bin/*',sDLL)
 
-
-    findALLIncludeFile(ab_dir + '/MyTool/include/*')
-    findALLIncludeFile(ab_dir + '/include/*')
-    findALLIncludeFile('E:\CLionProjects\MYtoolTest/include/*')
-    findALLIncludeFile('E:/CLionProjects/MYtoolTest/MyTool/include')
-    global sIncludefolder
+    findALLIncludeFile(ab_dir + '/MyTool/include/*',sInclude,sIncludefolder)
+    findALLIncludeFile(ab_dir + '/include/*',sInclude,sIncludefolder)
+    findALLIncludeFile('E:\CLionProjects\MYtoolTest/include/*',sInclude,sIncludefolder)
+    findALLIncludeFile('E:/CLionProjects/MYtoolTest/MyTool/include',sInclude,sIncludefolder)
     sIncludefolder.append('E:/CLionProjects/MYtoolTest/include')
-    # sIncludefolder
 
-    # findALLIncludeFile('E:/CLionProjects/MYtoolTest/MyTool/include/*')
+    sSrcFile = list(set(sSrcFile))
+    sLIB = list(set(sLIB))
+    sDLL = list(set(sDLL))
+    sInclude = list(set(sInclude ))
+    slibFolder = list(set(slibFolder))
+    sIncludefolder = list(set(sIncludefolder))
+
     print('项目源文件集合:', sSrcFile)
     print('项目动态库文件集合:', sDLL)
     print('项目静态库文件集合:', sLIB)
@@ -541,43 +547,51 @@ def examinFolder():
     return (ab_dir, projectName, sSrcFile, sDLL, sLIB, sInclude, slibFolder, sIncludefolder)
 
 
-def trytocopyQTdll():
+def examin_dll_src():
+    sDLL = []
+    sSrcFile = []
+
+    s = sys.argv
+    x, projectFiledir, filedir = s
+    projectName = projectFiledir[projectFiledir.rfind('\\') + 1:]
+    # 找出项目绝对路径
+    ab_dir = s[1]
+
+    findALLDllFile(ab_dir + '/bin/*',sDLL)
+    findALLDllFile('E:\CLionProjects\MYtoolTest/bin/*',sDLL)
+    sDLL = list(set(sDLL))
+
+    findAllSrcFile(ab_dir + '/src/*', sSrcFile)
+    findAllSrcFile(ab_dir + '/MyTool/src/*', sSrcFile)
+    findAllSrcFile('E:/CLionProjects/MYtoolTest/MyTool/src/*', sSrcFile)
+    findAllSrcFile('E:/CLionProjects/MYtoolTest/src/simdjson/*', sSrcFile)
+    sSrcFile = list(set(sSrcFile))
+
+    return (sDLL,sSrcFile)
+
+
+def trytocopyQTdll(sDLL):
     s = sys.argv
     projectDir = s[1]
-    #查看是否存在cmake-build-debug文件夹  cmake-build-release文件夹
-    path1=projectDir+'/cmake-build-debug'
-    path2=projectDir+'/cmake-build-release'
+    # 查看是否存在cmake-build-debug文件夹  cmake-build-release文件夹
+    path1 = projectDir + '/cmake-build-debug'
+    path2 = projectDir + '/cmake-build-release'
     if not os.path.exists(path1):
-        try:os.makedirs(path1)
-        except:pass
+        try:
+            os.makedirs(path1)
+        except:
+            pass
     if not os.path.exists(path2):
-        try:os.makedirs(path2)
-        except:pass
+        try:
+            os.makedirs(path2)
+        except:
+            pass
     # 查看是否存在那些动态库
     for dll in sDLL:
-        print(1)
-        print(dll)
-        if not os.path.exists(path1+'\\'+dll.split('/')[-1]):
+        if not os.path.exists(path1 + '\\' + dll.split('/')[-1]):
             shutil.copy(dll, path1)
-        if not os.path.exists(path2+'\\'+dll.split('/')[-1]):
+        if not os.path.exists(path2 + '\\' + dll.split('/')[-1]):
             shutil.copy(dll, path2)
-    #
-    #
-    #
-    # path3 = projectDir + '/cmake-build-debug/platforms'
-    # path4 = projectDir + '/cmake-build-release/platforms'
-    # if not os.path.exists(path3):#若不存在
-    #     try:
-    #         shutil.copytree("D:\ProgramData\Anaconda3\Library\plugins\platforms",path3)
-    #         os.makedirs(path1)
-    #     except:
-    #         pass
-    # if not os.path.exists(path4):#若不存在
-    #     try:
-    #         shutil.copytree("D:\ProgramData\Anaconda3\Library\plugins\platforms",path4)
-    #
-    #     except:
-    #         pass
 
 
 def main():
@@ -603,17 +617,12 @@ def main():
         os.makedirs(projectDir + '/MyTool/src/')
     except:
         pass
-    examinFolder()
-    trytocopyQTdll()
-
-    autoReplenishFile()
+    sDLL,sSrcFile=examin_dll_src()
+    trytocopyQTdll(sDLL)
+    autoReplenishFile(sSrcFile)
     ab_dir, projectName, sSrcFile, sDLL, sLIB, sInclude, slibFolder, sIncludefolder = examinFolder()
     WriteMake(ab_dir, projectName, sSrcFile, sDLL, sLIB, sInclude, slibFolder, sIncludefolder)
     return 0
-
-
-
-
 
 
 main()
