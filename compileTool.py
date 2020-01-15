@@ -552,8 +552,6 @@ def examin_dll_src():
     sSrcFile = []
 
     s = sys.argv
-    x, projectFiledir, filedir = s
-    projectName = projectFiledir[projectFiledir.rfind('\\') + 1:]
     # 找出项目绝对路径
     ab_dir = s[1]
 
