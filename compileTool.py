@@ -25,7 +25,7 @@ def findALLLibFile(ab_dir,sLIB,slibFolder):
     if not sLib:
         return 0
     for file in sLib:
-        if os.path.isfile(file) and (('.lib' in file) or ('.a' in file)):
+        if os.path.isfile(file) and (('.lib' in file) or ('.a' in file)or('.Lib' in file)):
             sLIB.append(file)
             slibFolder.append(os.path.split(file)[0])
         elif os.path.isdir(file):  # 这时候需要继续迭代

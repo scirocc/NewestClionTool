@@ -52,15 +52,13 @@ def findALLIncludeFile(ab_dir,sInclude,sIncludefolder):
         return 0
     for file in sinclude_:
         if os.path.isfile(file) and (('.h' in file) or ('.c' in file) or ('.hpp' in file)):
-            if "tbb" not in os.path.split(file)[0]:
+            if ("tbb" not in os.path.split(file)[0]) and ("OpenBLAS" not in os.path.split(file)[0])and ("armadillo" not in os.path.split(file)[0]):
                 sIncludefolder.append(os.path.split(file)[0])
-            if "armadillo" in os.path.split(file)[0]:
-                pass
             else:
                 sInclude.append(file)
             # sIncludefolder.append(os.path.split(file)[0])
         elif os.path.isdir(file):  # 这时候需要继续迭代
-            if "tbb" not in file:
+            if ("tbb" not in file)and("OpenBLAS" not in file)and("armadillo" not in file):
                 sIncludefolder.append(file)
             path = file + '/*'
             findALLIncludeFile(path,sInclude,sIncludefolder)
@@ -68,12 +66,14 @@ def findALLIncludeFile(ab_dir,sInclude,sIncludefolder):
 
 def WriteMake(ab_dir, projectName, sSrcFile, sDLL, sLIB, sInclude, slibFolder, sIncludefolder):
     str_ = 'add_executable({}\n'.format(projectName)
-    for srcFile in sorted(set(sSrcFile)):
-        srcFile = srcFile.replace('\\', '/')
-        str_ += srcFile + '\n'
-    for header in sorted(set(sInclude)):
-        header = header.replace('\\', '/')
-        str_ += header + '\n'
+    for srcFile in set(sSrcFile):
+        if ('ARMADILLO' not in srcFile.upper())and('OPENBLAS' not in srcFile.upper()):
+            srcFile = srcFile.replace('\\', '/')
+            str_ += srcFile + '\n'
+    for header in set(sInclude):
+        if ('ARMADILLO' not in header.upper())and('OPENBLAS' not in header.upper()):
+            header = header.replace('\\', '/')
+            str_ += header + '\n'
     str_ += 'D:/ProgramData/Anaconda3/include/Python.h' + '\n'
     str_ += ')\n'
     str_.replace('i', 'iiiiiiiiiiii')
@@ -81,42 +81,41 @@ def WriteMake(ab_dir, projectName, sSrcFile, sDLL, sLIB, sInclude, slibFolder, s
         f.write('cmake_minimum_required(VERSION 3.14)\n')
         f.write('project({})\n'.format(projectName))
         f.write('set(CMAKE_CXX_STANDARD 17)\n')
-        # f.write('set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")\n')
-
         f.write('set(CMAKE_CXX_FLAGS_DEBUG "/O2")   \n')
         f.write('include_directories(include)\n')
-        f.write('include_directories(E:/CLionProjects/MYtoolTest/MyTool/include)\n')
-        f.write('include_directories(D:/ProgramData/Anaconda3/include)\n')
-        # 还要把python的inlcude文件夹添加进来，因为有可能和python交互，用到python.h
-        for dir in sorted(set(sIncludefolder)):
+        f.write('include_directories(E:/CLionProjects/MYtoolForMSVC/MyTool/include)\n')
+        f.write('include_directories(E:/CLionProjects/MYtoolForMSVC/include/armadillo-9.800.4/include)\n')
+        f.write('include_directories(E:/CLionProjects/MYtoolForMSVC/include/OpenBLAS-0.3.6-x64/include)\n')
+
+        f.write(
+            'include_directories(D:/ProgramData/Anaconda3/include)\n')  # 还要把python的inlcude文件夹添加进来，因为有可能和python交互，用到python.h
+        for dir in set(sIncludefolder):
             dir = dir.replace('\\', '/')
-            f.write('include_directories({})\n'.format(dir))
+            if 'EIGEN' not in dir.upper():
+                f.write('include_directories({})\n'.format(dir))
         f.write('link_directories(bin)\n')
-        f.write('link_directories(D:/ProgramData/Anaconda3/libs)\n')
-        # 还要把python的inlcude文件夹添加进来，因为有可能和python交互，用到python36.lib
-        for dir in sorted(set(slibFolder)):
+        f.write(
+            'link_directories(D:/ProgramData/Anaconda3/libs)\n')  # 还要把python的inlcude文件夹添加进来，因为有可能和python交互，用到python36.lib
+        for dir in set(slibFolder):
             dir = dir.replace('\\', '/')
             f.write('include_directories({})\n'.format(dir))
         f.write(str_)  # add_executable信息
         str1_ = 'TARGET_LINK_LIBRARIES({}'.format(projectName) + ' \n'
-        str1_+=[lib.replace('\\', '/')+ '\n' for lib in sLIB if "libgcc.a" in lib][0]
-        str1_+=[lib.replace('\\', '/')+ '\n' for lib in sLIB if "libstdc++.a" in lib][0]
-        for lib in sorted(set(sLIB)):
+        for lib in set(sLIB):
             lib = lib.replace('\\', '/')
-            if ("libgcc.a" not in lib)and("libstdc++.a" not in lib):
-                str1_ += lib + '\n'
+            str1_ += lib + '\n'
         str1_ += 'python36.lib' + '\n'  # 添加这个东西
         str1_ += 'imagehlp.lib' + '\n'  # 添加这个东西
-        str1_ += 'legacy_stdio_definitions.lib' + '\n'  # 添加这个东西
         str1_ += ')\n'
         f.write('{}'.format(str1_))
-        # str1_ = 'TARGET_LINK_LIBRARIES({}'.format(projectName) + ' \n'
-        # for dll in set(sDLL):
-        #     dll = dll.replace('\\', '/')
-        #     if 'libtbb' not in dll:
-        #         str1_ += dll + '\n'
-        # str1_ += ')\n'
-        # f.write('{}'.format(str1_))
+        str1_ = 'TARGET_LINK_LIBRARIES({}'.format(projectName) + ' \n'
+        sDLL=[]
+        for dll in set(sDLL):
+            dll = dll.replace('\\', '/')
+            if 'libtbb' not in dll:
+                str1_ += dll + '\n'
+        str1_ += ')\n'
+        f.write('{}'.format(str1_))
     return 0
 
 
@@ -359,6 +358,7 @@ def removeTemplate(str_):  # 针对cpp
                 recursiveMark = True
                 indexOfStr = indexOfleftBrace + lineLen + lineCounter
                 endloc = getIndexOfCorreBrace(str_, indexOfStr, 1, 0)
+                # str_ = str_.replace(str_[indexOfStr:endloc + 1], ';')
                 str_ = str_.replace(str_[indexOfTemplate:endloc + 1], ';')
                 break
         else:  # 不可以删除
@@ -513,20 +513,20 @@ def examinFolder():
     ab_dir = s[1]
     findAllSrcFile(ab_dir + '/src/*',sSrcFile)
     findAllSrcFile(ab_dir + '/MyTool/src/*',sSrcFile)
-    findAllSrcFile('E:/CLionProjects/MYtoolTest/MyTool/src/*',sSrcFile)
-    findAllSrcFile('E:/CLionProjects/MYtoolTest/src/simdjson/*',sSrcFile)
+    findAllSrcFile('E:/CLionProjects/MYtoolForMSVC/MyTool/src/*',sSrcFile)
+    findAllSrcFile('E:/CLionProjects/MYtoolForMSVC/src/simdjson/*',sSrcFile)
 
     findALLLibFile(ab_dir + '/bin/*',sLIB,slibFolder)
-    findALLLibFile('E:\CLionProjects\MYtoolTest/bin/*',sLIB,slibFolder)
+    findALLLibFile('E:\CLionProjects\MYtoolForMSVC/bin/*',sLIB,slibFolder)
 
     findALLDllFile(ab_dir + '/bin/*',sDLL)
-    findALLDllFile('E:\CLionProjects\MYtoolTest/bin/*',sDLL)
+    findALLDllFile('E:\CLionProjects\MYtoolForMSVC/bin/*',sDLL)
 
     findALLIncludeFile(ab_dir + '/MyTool/include/*',sInclude,sIncludefolder)
     findALLIncludeFile(ab_dir + '/include/*',sInclude,sIncludefolder)
-    findALLIncludeFile('E:\CLionProjects\MYtoolTest/include/*',sInclude,sIncludefolder)
-    findALLIncludeFile('E:/CLionProjects/MYtoolTest/MyTool/include',sInclude,sIncludefolder)
-    sIncludefolder.append('E:/CLionProjects/MYtoolTest/include')
+    findALLIncludeFile('E:\CLionProjects\MYtoolForMSVC/include/*',sInclude,sIncludefolder)
+    findALLIncludeFile('E:/CLionProjects/MYtoolForMSVC/MyTool/include',sInclude,sIncludefolder)
+    sIncludefolder.append('E:/CLionProjects/MYtoolForMSVC/include')
 
     sSrcFile = list(set(sSrcFile))
     sLIB = list(set(sLIB))
@@ -553,13 +553,13 @@ def examin_dll_src():
     ab_dir = s[1]
 
     findALLDllFile(ab_dir + '/bin/*',sDLL)
-    findALLDllFile('E:\CLionProjects\MYtoolTest/bin/*',sDLL)
+    findALLDllFile('E:\CLionProjects\MYtoolForMSVC/bin/*',sDLL)
     sDLL = list(set(sDLL))
 
     findAllSrcFile(ab_dir + '/src/*', sSrcFile)
     findAllSrcFile(ab_dir + '/MyTool/src/*', sSrcFile)
-    findAllSrcFile('E:/CLionProjects/MYtoolTest/MyTool/src/*', sSrcFile)
-    findAllSrcFile('E:/CLionProjects/MYtoolTest/src/simdjson/*', sSrcFile)
+    findAllSrcFile('E:/CLionProjects/MYtoolForMSVC/MyTool/src/*', sSrcFile)
+    findAllSrcFile('E:/CLionProjects/MYtoolForMSVC/src/simdjson/*', sSrcFile)
     sSrcFile = list(set(sSrcFile))
 
     return (sDLL,sSrcFile)
@@ -591,9 +591,6 @@ def trytocopyQTdll(sDLL):
 
 def main():
     s = sys.argv
-    print(s[0])
-    print(s[1])
-    print(s[2])
     projectDir = s[1]
     try:
         os.makedirs(projectDir + '/bin/')
