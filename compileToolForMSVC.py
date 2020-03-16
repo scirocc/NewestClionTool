@@ -587,7 +587,12 @@ def trytocopyQTdll(sDLL):
             shutil.copy(dll, path1)
         if not os.path.exists(path2 + '\\' + dll.split('/')[-1]):
             shutil.copy(dll, path2)
-
+    try:
+        shutil.copytree('D:\ProgramData\Anaconda3\Library\plugins\platforms',path1 + '\\platforms')
+    except:pass
+    try:
+        shutil.copytree('D:\ProgramData\Anaconda3\Library\plugins\platforms',path1 + '\\platforms')
+    except:pass
 
 def main():
     s = sys.argv
