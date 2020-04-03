@@ -105,6 +105,8 @@ def WriteMake(ab_dir, projectName, sSrcFile, sDLL, sLIB, sInclude, slibFolder, s
         for lib in set(sLIB):
             lib = lib.replace('\\', '/')
             str1_ += lib + '\n'
+        str1_ += 'D:/boost_1_72_0/bin.v2/libs/context/build/' \
+                 'msvc-14.2/release/address-model-64/link-static/threading-multi/libboost_context-vc142-mt-x64-1_72.lib' + '\n'  # 添加这个东西
         str1_ += 'python36.lib' + '\n'  # 添加这个东西
         str1_ += 'imagehlp.lib' + '\n'  # 添加这个东西
         str1_ += ')\n'
