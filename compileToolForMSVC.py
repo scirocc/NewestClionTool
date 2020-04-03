@@ -83,10 +83,10 @@ def WriteMake(ab_dir, projectName, sSrcFile, sDLL, sLIB, sInclude, slibFolder, s
         f.write('set(CMAKE_CXX_STANDARD 17)\n')
         f.write('set(CMAKE_CXX_FLAGS_DEBUG "/O2")   \n')
         f.write('include_directories(include)\n')
+        f.write('include_directories(D:/boost_1_72_0)\n')
         f.write('include_directories(E:/CLionProjects/MYtoolForMSVC/MyTool/include)\n')
         f.write('include_directories(E:/CLionProjects/MYtoolForMSVC/include/armadillo-9.800.4/include)\n')
         f.write('include_directories(E:/CLionProjects/MYtoolForMSVC/include/OpenBLAS-0.3.6-x64/include)\n')
-
         f.write(
             'include_directories(D:/ProgramData/Anaconda3/include)\n')  # 还要把python的inlcude文件夹添加进来，因为有可能和python交互，用到python.h
         for dir in set(sIncludefolder):
@@ -94,6 +94,7 @@ def WriteMake(ab_dir, projectName, sSrcFile, sDLL, sLIB, sInclude, slibFolder, s
             if 'EIGEN' not in dir.upper():
                 f.write('include_directories({})\n'.format(dir))
         f.write('link_directories(bin)\n')
+        f.write('link_directories(D:/boost_1_72_0/bin.v2/libs)\n')
         f.write(
             'link_directories(D:/ProgramData/Anaconda3/libs)\n')  # 还要把python的inlcude文件夹添加进来，因为有可能和python交互，用到python36.lib
         for dir in set(slibFolder):
