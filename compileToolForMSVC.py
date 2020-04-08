@@ -302,19 +302,19 @@ def getContentWithoutBrace(str_):  # 去掉{}当中的内容，template中的模
 
 
 def reWriteThisCPPFile(sourceFilePath):
-    with open(sourceFilePath, 'r', encoding='utf-8')as f:
+    with open(sourceFilePath, 'r', encoding='gbk')as f:
         datas = f.readlines()
     sData = [line for line in datas if '#include' not in line]
     print(sourceFilePath.split('\\'))
     headerName = sourceFilePath.split('\\')[-1].replace('.cpp', '.h')
     str_ = '#include"{}"\n'.format(headerName)
     str_ = str_ + "".join(sData)
-    with open(sourceFilePath, 'w', encoding='utf-8')as f:
+    with open(sourceFilePath, 'w', encoding='gbk')as f:
         f.write(str_)
 
 
 def tell_if_is_templateFile(filepath):
-    with open(filepath, 'r', encoding='utf-8')as f:
+    with open(filepath, 'r', encoding='gbk')as f:
         sData = f.readlines()
     templateMark = False
     for line in sData:
@@ -330,7 +330,7 @@ def tell_if_is_templateFile(filepath):
 
 
 def getHPPFileContent(filepath):
-    with open(filepath, 'r', encoding='utf-8')as f: datas = f.readlines()
+    with open(filepath, 'r', encoding='gbk')as f: datas = f.readlines()
     sData = [line for line in datas if '#include' not in line]
     sInclude_str = [line for line in datas if '#include' in line]
     str_ = "".join(sData)
@@ -376,7 +376,7 @@ def removeTemplate(str_):  # 针对cpp
 
 
 def getHFileContent(filepath):
-    with open(filepath, 'r', encoding='utf-8')as f: datas = f.readlines()
+    with open(filepath, 'r', encoding='gbk')as f: datas = f.readlines()
     sData = [line for line in datas if '#include' not in line]
     sInclude_str = [line for line in datas if '#include' in line]
     str_ = "".join(sData)
@@ -389,14 +389,14 @@ def getHFileContent(filepath):
 
 
 def adjustCPPfile(filepath):  # remove template lines
-    with open(filepath, 'r', encoding='utf-8')as f: datas = f.readlines()
+    with open(filepath, 'r', encoding='gbk')as f: datas = f.readlines()
     sData = [line for line in datas if '#include' not in line]
     str_ = "".join(sData)
     str_ = removeTemplate(str_)
     filename = filepath[filepath.rfind('\\') + 1:]
     filename = filename.replace('.cpp', '.hpp')
     str_ = "#include <{}>\n".format(filename) + str_
-    with open(filepath, 'w', encoding='utf-8')as f:
+    with open(filepath, 'w', encoding='gbk')as f:
         f.write(str_)
 
 
@@ -428,7 +428,7 @@ def autoReplenishFile(sSrcFile):
                         os.makedirs("\\".join(corresponding_header2.split('\\')[:-1]))
                     except:
                         pass
-                    with open(corresponding_header2, 'w', encoding='utf-8')as f:
+                    with open(corresponding_header2, 'w', encoding='gbk')as f:
                         str_ = '#ifndef '
                         for folder in sFolder:
                             str_ += folder.upper() + '_'
@@ -470,7 +470,7 @@ def autoReplenishFile(sSrcFile):
                         except:
                             pass
 
-                    with open(corresponding_header1, 'w', encoding='utf-8')as f:
+                    with open(corresponding_header1, 'w', encoding='gbk')as f:
                         str_ = '#ifndef '
                         for folder in sFolder:
                             str_ += folder.upper() + '_'
