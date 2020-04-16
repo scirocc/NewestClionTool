@@ -83,7 +83,7 @@ def WriteMake(ab_dir, projectName, sSrcFile, sDLL, sLIB, sInclude, slibFolder, s
     str_ += 'D:/ProgramData/Anaconda3/include/Python.h' + '\n'
     str_ += ')\n'
     str_.replace('i', 'iiiiiiiiiiii')
-    with open(ab_dir + '/CMakeLists.txt', 'w')as f:
+    with open(ab_dir + '/CMakeLists.txt', 'w')as f:#
         f.write('cmake_minimum_required(VERSION 3.14)\n')
         f.write('project({})\n'.format(projectName))
         f.write('set(CMAKE_CXX_STANDARD 17)\n')
