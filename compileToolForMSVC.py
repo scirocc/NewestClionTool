@@ -58,7 +58,10 @@ def findALLIncludeFile(ab_dir,sInclude,sIncludefolder):
                 sInclude.append(file)
             # sIncludefolder.append(os.path.split(file)[0])
         elif os.path.isdir(file):  # 这时候需要继续迭代
-            if ("tbb" not in file)and("OpenBLAS" not in file)and("armadillo" not in file):
+            if ("tbb" not in file)\
+                    and("OpenBLAS" not in file)\
+                    and("armadillo" not in file)\
+                    and("armadillo" not in file):
                 sIncludefolder.append(file)
             path = file + '/*'
             findALLIncludeFile(path,sInclude,sIncludefolder)
@@ -596,6 +599,7 @@ def trytocopyQTdll(sDLL):
     try:
         shutil.copytree('D:\ProgramData\Anaconda3\Library\plugins\platforms',path1 + '\\platforms')
     except:pass
+
 
 def main():
     s = sys.argv
