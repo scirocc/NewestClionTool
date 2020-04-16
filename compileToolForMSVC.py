@@ -93,7 +93,7 @@ def WriteMake(ab_dir, projectName, sSrcFile, sDLL, sLIB, sInclude, slibFolder, s
         f.write('include_directories(E:/CLionProjects/MYtoolForMSVC/MyTool/include)\n')
         f.write('include_directories(E:/CLionProjects/MYtoolForMSVC/include/armadillo-9.800.4/include)\n')
         f.write('include_directories(E:/CLionProjects/MYtoolForMSVC/include/OpenBLAS-0.3.6-x64/include)\n')
-        f.write('include_directories(E:/CLionProjects/MYtoolForMSVC/include/spdlog)\n')
+        # f.write('include_directories(E:/CLionProjects/MYtoolForMSVC/include/spdlog)\n')
         f.write('include_directories(D:/ProgramData/Anaconda3/include)\n')
         # 还要把python的inlcude文件夹添加进来，因为有可能和python交互，用到python.h
         for dir in set(sIncludefolder):
@@ -593,6 +593,7 @@ def trytocopyQTdll(sDLL):
             pass
     # 查看是否存在那些动态库
     for dll in sDLL:
+        dll=dll.replace('\\','/')
         if not os.path.exists(path1 + '\\' + dll.split('/')[-1]):
             shutil.copy(dll, path1)
         if not os.path.exists(path2 + '\\' + dll.split('/')[-1]):
