@@ -52,7 +52,10 @@ def findALLIncludeFile(ab_dir,sInclude,sIncludefolder):
         return 0
     for file in sinclude_:
         if os.path.isfile(file) and (('.h' in file) or ('.c' in file) or ('.hpp' in file)):
-            if ("tbb" not in os.path.split(file)[0]) and ("OpenBLAS" not in os.path.split(file)[0])and ("armadillo" not in os.path.split(file)[0]):
+            if ("tbb" not in os.path.split(file)[0]) \
+                    and ("OpenBLAS" not in os.path.split(file)[0])\
+                    and ("spdlog" not in os.path.split(file)[0])\
+                    and ("armadillo" not in os.path.split(file)[0]):
                 sIncludefolder.append(os.path.split(file)[0])
             else:
                 sInclude.append(file)
@@ -60,7 +63,7 @@ def findALLIncludeFile(ab_dir,sInclude,sIncludefolder):
         elif os.path.isdir(file):  # 这时候需要继续迭代
             if ("tbb" not in file)\
                     and("OpenBLAS" not in file)\
-                    and("armadillo" not in file)\
+                    and("spdlog" not in file)\
                     and("armadillo" not in file):
                 sIncludefolder.append(file)
             path = file + '/*'
@@ -90,6 +93,7 @@ def WriteMake(ab_dir, projectName, sSrcFile, sDLL, sLIB, sInclude, slibFolder, s
         f.write('include_directories(E:/CLionProjects/MYtoolForMSVC/MyTool/include)\n')
         f.write('include_directories(E:/CLionProjects/MYtoolForMSVC/include/armadillo-9.800.4/include)\n')
         f.write('include_directories(E:/CLionProjects/MYtoolForMSVC/include/OpenBLAS-0.3.6-x64/include)\n')
+        f.write('include_directories(E:/CLionProjects/MYtoolForMSVC/include/spdlog)\n')
         f.write(
             'include_directories(D:/ProgramData/Anaconda3/include)\n')  # 还要把python的inlcude文件夹添加进来，因为有可能和python交互，用到python.h
         for dir in set(sIncludefolder):
