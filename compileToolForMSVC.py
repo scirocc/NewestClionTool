@@ -323,6 +323,7 @@ def reWriteThisCPPFile(sourceFilePath):
 
 
 def tell_if_is_templateFile(filepath):
+    print(filepath)
     with open(filepath, 'r', encoding='gbk')as f:
         sData = f.readlines()
     templateMark = False
