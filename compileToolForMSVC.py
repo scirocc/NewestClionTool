@@ -77,7 +77,9 @@ def WriteMake(ab_dir, projectName, sSrcFile, sDLL, sLIB, sInclude, slibFolder, s
             srcFile = srcFile.replace('\\', '/')
             str_ += srcFile + '\n'
     for header in set(sInclude):
-        if ('ARMADILLO' not in header.upper())and('OPENBLAS' not in header.upper()):
+        if ('ARMADILLO' not in header.upper())\
+                and('OPENBLAS' not in header.upper())\
+                and('SPDLOG' not in header.upper()):
             header = header.replace('\\', '/')
             str_ += header + '\n'
     str_ += 'D:/ProgramData/Anaconda3/include/Python.h' + '\n'
@@ -93,7 +95,7 @@ def WriteMake(ab_dir, projectName, sSrcFile, sDLL, sLIB, sInclude, slibFolder, s
         f.write('include_directories(E:/CLionProjects/MYtoolForMSVC/MyTool/include)\n')
         f.write('include_directories(E:/CLionProjects/MYtoolForMSVC/include/armadillo-9.800.4/include)\n')
         f.write('include_directories(E:/CLionProjects/MYtoolForMSVC/include/OpenBLAS-0.3.6-x64/include)\n')
-        # f.write('include_directories(E:/CLionProjects/MYtoolForMSVC/include/spdlog)\n')
+        f.write('include_directories(E:/CLionProjects/MYtoolForMSVC/include/spdlog)\n')
         f.write('include_directories(D:/ProgramData/Anaconda3/include)\n')
         # 还要把python的inlcude文件夹添加进来，因为有可能和python交互，用到python.h
         for dir in set(sIncludefolder):
