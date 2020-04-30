@@ -93,7 +93,7 @@ def WriteMake(ab_dir, projectName, sSrcFile, sDLL, sLIB, sInclude, slibFolder, s
         f.write('include_directories(include)\n')
         f.write('include_directories(D:/boost_1_72_0)\n')
         f.write('include_directories(E:/CLionProjects/MYtoolForMSVC/MyTool/include)\n')
-        f.write('include_directories(E:/CLionProjects/MYtoolForMSVC/include/armadillo-9.800.4/include)\n')
+        f.write('include_directories(E:/CLionProjects/MYtoolForMSVC/include/armadillo-9.870.2/include)\n')
         f.write('include_directories(E:/CLionProjects/MYtoolForMSVC/include/OpenBLAS-0.3.6-x64/include)\n')
         f.write('include_directories(E:/CLionProjects/MYtoolForMSVC/include/spdlog)\n')
         f.write('include_directories(D:/ProgramData/Anaconda3/include)\n')
